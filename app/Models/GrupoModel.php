@@ -17,15 +17,17 @@ class GrupoModel extends Model
         'nombre',
         'anio_academico',
         'profesor_id',
-        'extra'
+        'capacidad_maxima',
+        'aula',
+        'turno'
     ];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
 
     protected array $casts = [
-        'extra' => 'json',
-        'anio_academico' => 'int'
+        'anio_academico' => 'int',
+        'capacidad_maxima' => 'int'
     ];
     protected array $castHandlers = [];
 
@@ -39,7 +41,10 @@ class GrupoModel extends Model
         'curso_id' => 'required|is_natural_no_zero',
         'nombre' => 'required|min_length[3]|max_length[80]',
         'anio_academico' => 'required|integer|min_length[4]|max_length[4]',
-        'profesor_id' => 'permit_empty|is_natural_no_zero'
+        'profesor_id' => 'permit_empty|is_natural_no_zero',
+        'capacidad_maxima' => 'permit_empty|integer',
+        'aula' => 'permit_empty|max_length[50]',
+        'turno' => 'permit_empty|in_list[Mañana,Tarde,Noche]'
     ];
 
     protected $validationMessages = [
@@ -57,6 +62,15 @@ class GrupoModel extends Model
             'integer' => 'El año académico debe ser un número',
             'min_length' => 'El año académico debe tener 4 dígitos',
             'max_length' => 'El año académico debe tener 4 dígitos'
+        ],
+        'capacidad_maxima' => [
+            'integer' => 'La capacidad máxima debe ser un número'
+        ],
+        'aula' => [
+            'max_length' => 'El aula no puede exceder 50 caracteres'
+        ],
+        'turno' => [
+            'in_list' => 'El turno debe ser Mañana, Tarde o Noche'
         ]
     ];
 
@@ -75,18 +89,12 @@ class GrupoModel extends Model
 
     public function getGrupoCompleto(int $id)
     {
-        $grupo = $this->select('grupos.*, cursos.nombre as curso_nombre, cursos.codigo as curso_codigo, usuarios.nombre_completo as profesor_nombre, profesores.codigo_profesor')
+        return $this->select('grupos.*, cursos.nombre as curso_nombre, cursos.codigo as curso_codigo, usuarios.nombre_completo as profesor_nombre, profesores.codigo_profesor')
             ->join('cursos', 'cursos.id = grupos.curso_id')
             ->join('profesores', 'profesores.id = grupos.profesor_id', 'left')
             ->join('usuarios', 'usuarios.id = profesores.usuario_id', 'left')
             ->where('grupos.id', $id)
             ->first();
-
-        if ($grupo && isset($grupo['extra']) && is_string($grupo['extra'])) {
-            $grupo['extra'] = json_decode($grupo['extra'], true);
-        }
-
-        return $grupo;
     }
 
     public function getEstudiantes(int $grupoId, ?string $estadoInscripcion = null)

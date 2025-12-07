@@ -126,6 +126,27 @@ class Grupo extends ResourceController
                 'errors' => [
                     'is_natural_no_zero' => 'El ID del profesor debe ser válido'
                 ]
+            ],
+            'capacidad_maxima' => [
+                'label' => 'Capacidad máxima',
+                'rules' => 'permit_empty|integer',
+                'errors' => [
+                    'integer' => 'La capacidad máxima debe ser un número'
+                ]
+            ],
+            'aula' => [
+                'label' => 'Aula',
+                'rules' => 'permit_empty|max_length[50]',
+                'errors' => [
+                    'max_length' => 'El aula no puede exceder 50 caracteres'
+                ]
+            ],
+            'turno' => [
+                'label' => 'Turno',
+                'rules' => 'permit_empty|in_list[Mañana,Tarde,Noche]',
+                'errors' => [
+                    'in_list' => 'El turno debe ser Mañana, Tarde o Noche'
+                ]
             ]
         ];
 
@@ -137,17 +158,14 @@ class Grupo extends ResourceController
             ], ResponseInterface::HTTP_BAD_REQUEST);
         }
 
-        $extra = $this->request->getVar('extra');
-        if ($extra && is_string($extra)) {
-            $extra = json_decode($extra, true);
-        }
-
         $data = [
             'curso_id' => $this->request->getVar('curso_id'),
             'nombre' => $this->request->getVar('nombre'),
             'anio_academico' => $this->request->getVar('anio_academico'),
             'profesor_id' => $this->request->getVar('profesor_id'),
-            'extra' => $extra ? json_encode($extra) : null
+            'capacidad_maxima' => $this->request->getVar('capacidad_maxima'),
+            'aula' => $this->request->getVar('aula'),
+            'turno' => $this->request->getVar('turno')
         ];
 
         $grupoId = $this->grupoModel->insert($data);
@@ -217,6 +235,27 @@ class Grupo extends ResourceController
                 'errors' => [
                     'is_natural_no_zero' => 'El ID del profesor debe ser válido'
                 ]
+            ],
+            'capacidad_maxima' => [
+                'label' => 'Capacidad máxima',
+                'rules' => 'permit_empty|integer',
+                'errors' => [
+                    'integer' => 'La capacidad máxima debe ser un número'
+                ]
+            ],
+            'aula' => [
+                'label' => 'Aula',
+                'rules' => 'permit_empty|max_length[50]',
+                'errors' => [
+                    'max_length' => 'El aula no puede exceder 50 caracteres'
+                ]
+            ],
+            'turno' => [
+                'label' => 'Turno',
+                'rules' => 'permit_empty|in_list[Mañana,Tarde,Noche]',
+                'errors' => [
+                    'in_list' => 'El turno debe ser Mañana, Tarde o Noche'
+                ]
             ]
         ];
 
@@ -246,12 +285,16 @@ class Grupo extends ResourceController
             $data['profesor_id'] = $this->request->getVar('profesor_id');
         }
 
-        if ($this->request->getVar('extra')) {
-            $extra = $this->request->getVar('extra');
-            if (is_string($extra)) {
-                $extra = json_decode($extra, true);
-            }
-            $data['extra'] = json_encode($extra);
+        if ($this->request->getVar('capacidad_maxima') !== null) {
+            $data['capacidad_maxima'] = $this->request->getVar('capacidad_maxima');
+        }
+
+        if ($this->request->getVar('aula') !== null) {
+            $data['aula'] = $this->request->getVar('aula');
+        }
+
+        if ($this->request->getVar('turno') !== null) {
+            $data['turno'] = $this->request->getVar('turno');
         }
 
         if (empty($data)) {
