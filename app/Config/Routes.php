@@ -51,7 +51,7 @@ $routes->group('api', ['namespace' => 'App\Controllers'], function($routes) {
         $routes->get('(:num)/estadisticas', 'Profesor::getEstadisticas/$1');
         $routes->patch('(:num)/estado', 'Profesor::cambiarEstado/$1');
     });
-    
+
     $routes->group('cursos', ['filter' => 'auth'], function($routes) {
         $routes->get('', 'Curso::index');
         $routes->get('(:num)', 'Curso::show/$1');
@@ -63,5 +63,19 @@ $routes->group('api', ['namespace' => 'App\Controllers'], function($routes) {
         $routes->get('(:num)/sesiones', 'Curso::getSesiones/$1');
         $routes->get('(:num)/estadisticas', 'Curso::getEstadisticas/$1');
         $routes->get('(:num)/estudiantes', 'Curso::getEstudiantes/$1');
+    });
+    
+    $routes->group('grupos', ['filter' => 'auth'], function($routes) {
+        $routes->get('', 'Grupo::index');
+        $routes->get('(:num)', 'Grupo::show/$1');
+        $routes->post('', 'Grupo::create');
+        $routes->put('(:num)', 'Grupo::update/$1');
+        $routes->delete('(:num)', 'Grupo::delete/$1');
+        $routes->get('(:num)/estudiantes', 'Grupo::getEstudiantes/$1');
+        $routes->get('(:num)/horarios', 'Grupo::getHorarios/$1');
+        $routes->get('(:num)/sesiones', 'Grupo::getSesiones/$1');
+        $routes->get('(:num)/asistencias', 'Grupo::getAsistencias/$1');
+        $routes->get('(:num)/estadisticas', 'Grupo::getEstadisticas/$1');
+        $routes->patch('(:num)/profesor', 'Grupo::asignarProfesor/$1');
     });
 });
