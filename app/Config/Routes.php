@@ -2,10 +2,6 @@
 
 use CodeIgniter\Router\RouteCollection;
 
-/**
- * @var RouteCollection $routes
- */
-
 $routes->get('/', 'Home::index');
 
 $routes->group('api', ['namespace' => 'App\Controllers'], function($routes) {
@@ -16,6 +12,7 @@ $routes->group('api', ['namespace' => 'App\Controllers'], function($routes) {
         $routes->post('logout', 'Auth::logout', ['filter' => 'auth']);
         $routes->get('me', 'Auth::me', ['filter' => 'auth']);
     });
+
     $routes->group('usuarios', ['filter' => 'auth'], function($routes) {
         $routes->get('', 'Usuario::index');
         $routes->get('(:num)', 'Usuario::show/$1');
@@ -64,7 +61,7 @@ $routes->group('api', ['namespace' => 'App\Controllers'], function($routes) {
         $routes->get('(:num)/estadisticas', 'Curso::getEstadisticas/$1');
         $routes->get('(:num)/estudiantes', 'Curso::getEstudiantes/$1');
     });
-    
+
     $routes->group('grupos', ['filter' => 'auth'], function($routes) {
         $routes->get('', 'Grupo::index');
         $routes->get('(:num)', 'Grupo::show/$1');
@@ -77,5 +74,16 @@ $routes->group('api', ['namespace' => 'App\Controllers'], function($routes) {
         $routes->get('(:num)/asistencias', 'Grupo::getAsistencias/$1');
         $routes->get('(:num)/estadisticas', 'Grupo::getEstadisticas/$1');
         $routes->patch('(:num)/profesor', 'Grupo::asignarProfesor/$1');
+    });
+
+    $routes->group('inscripciones', ['filter' => 'auth'], function($routes) {
+        $routes->get('', 'Inscripcion::index');
+        $routes->get('(:num)', 'Inscripcion::show/$1');
+        $routes->post('', 'Inscripcion::create');
+        $routes->put('(:num)', 'Inscripcion::update/$1');
+        $routes->delete('(:num)', 'Inscripcion::delete/$1');
+        $routes->patch('(:num)/estado', 'Inscripcion::cambiarEstado/$1');
+        $routes->post('masiva', 'Inscripcion::inscripcionMasiva');
+        $routes->get('grupo/(:num)/capacidad', 'Inscripcion::verificarCapacidad/$1');
     });
 });
