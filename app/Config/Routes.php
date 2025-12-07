@@ -86,4 +86,20 @@ $routes->group('api', ['namespace' => 'App\Controllers'], function($routes) {
         $routes->post('masiva', 'Inscripcion::inscripcionMasiva');
         $routes->get('grupo/(:num)/capacidad', 'Inscripcion::verificarCapacidad/$1');
     });
+
+    $routes->group('sesiones', ['filter' => 'auth'], function($routes) {
+        $routes->get('', 'Sesion::index');
+        $routes->get('(:num)', 'Sesion::show/$1');
+        $routes->post('', 'Sesion::create');
+        $routes->put('(:num)', 'Sesion::update/$1');
+        $routes->delete('(:num)', 'Sesion::delete/$1');
+        $routes->get('(:num)/asistencias', 'Sesion::getAsistencias/$1');
+        $routes->get('(:num)/estadisticas', 'Sesion::getEstadisticas/$1');
+        $routes->patch('(:num)/estado', 'Sesion::cambiarEstado/$1');
+        $routes->patch('(:num)/iniciar', 'Sesion::iniciarSesion/$1');
+        $routes->patch('(:num)/cancelar', 'Sesion::cancelarSesion/$1');
+        $routes->get('fecha/(:segment)', 'Sesion::getSesionesPorFecha/$1');
+        $routes->post('generar-masivas', 'Sesion::generarSesionesMasivas');
+        $routes->get('(:num)/estudiantes', 'Sesion::getEstudiantesParaAsistencia/$1');
+    });
 });
