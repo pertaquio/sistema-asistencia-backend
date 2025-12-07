@@ -70,8 +70,29 @@ class Auth extends ResourceController
             ], ResponseInterface::HTTP_TOO_MANY_REQUESTS);
         }
 
+        $usuarioExiste = $this->usuarioModel->where('nombre_usuario', $identificador)
+            ->orWhere('email', $identificador)
+            ->first();
+
+        if (!$usuarioExiste) {
+            $this->cache->save($rateLimitKey, $attempts + 1, 900);
+            
+            return $this->respond([
+                'status' => 'error',
+                'message' => 'El usuario no existe'
+            ], ResponseInterface::HTTP_NOT_FOUND);
+        }
+
         $usuario = $this->usuarioModel->verificarCredenciales($identificador, $contrasena);
 
+        if (!$usuario) {
+            $this->cache->save($rateLimitKey, $attempts + 1, 900);
+            
+            return $this->respond([
+                'status' => 'error',
+                'message' => 'Contraseña incorrecta'
+            ], ResponseInterface::HTTP_UNAUTHORIZED);
+        }
         if (!$usuario) {
             $this->cache->save($rateLimitKey, $attempts + 1, 900);
             
@@ -80,7 +101,6 @@ class Auth extends ResourceController
                 'message' => 'Credenciales inválidas'
             ], ResponseInterface::HTTP_UNAUTHORIZED);
         }
-
         if ($usuario['estado_id'] == EstadoModel::INACTIVO) {
             return $this->respond([
                 'status' => 'error',
