@@ -102,4 +102,21 @@ $routes->group('api', ['namespace' => 'App\Controllers'], function($routes) {
         $routes->post('generar-masivas', 'Sesion::generarSesionesMasivas');
         $routes->get('(:num)/estudiantes', 'Sesion::getEstudiantesParaAsistencia/$1');
     });
+    
+    $routes->group('asistencias', ['filter' => 'auth'], function($routes) {
+        $routes->get('', 'Asistencia::index');
+        $routes->get('(:num)', 'Asistencia::show/$1');
+        $routes->post('', 'Asistencia::create');
+        $routes->put('(:num)', 'Asistencia::update/$1');
+        $routes->delete('(:num)', 'Asistencia::delete/$1');
+        $routes->post('registrar-masivo', 'Asistencia::registrarMasivo');
+        $routes->post('marcar-presente', 'Asistencia::marcarPresente');
+        $routes->post('marcar-ausente', 'Asistencia::marcarAusente');
+        $routes->post('marcar-tarde', 'Asistencia::marcarTarde');
+        $routes->patch('(:num)/justificar', 'Asistencia::justificarAusencia/$1');
+        $routes->get('reporte/estudiante/(:num)', 'Asistencia::reportePorEstudiante/$1');
+        $routes->get('reporte/grupo/(:num)', 'Asistencia::reportePorGrupo/$1');
+        $routes->get('estadisticas/estudiante/(:num)', 'Asistencia::estadisticasPorEstudiante/$1');
+        $routes->get('estadisticas/grupo/(:num)', 'Asistencia::estadisticasPorGrupo/$1');
+    });
 });
