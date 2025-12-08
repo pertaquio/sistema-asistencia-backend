@@ -23,6 +23,16 @@ $routes->group('api', ['namespace' => 'App\Controllers'], function($routes) {
         $routes->patch('(:num)/contrasena', 'Usuario::cambiarContrasena/$1');
     });
 
+    $routes->group('roles', ['filter' => 'auth'], function($routes) {
+        $routes->get('', 'Rol::index');
+        $routes->get('(:num)', 'Rol::show/$1');
+        $routes->post('', 'Rol::create');
+        $routes->put('(:num)', 'Rol::update/$1');
+        $routes->delete('(:num)', 'Rol::delete/$1');
+        $routes->get('(:num)/usuarios', 'Rol::getUsuarios/$1');
+        $routes->get('(:num)/estadisticas', 'Rol::getEstadisticas/$1');
+    });
+
     $routes->group('estudiantes', ['filter' => 'auth'], function($routes) {
         $routes->get('', 'Estudiante::index');
         $routes->get('(:num)', 'Estudiante::show/$1');
