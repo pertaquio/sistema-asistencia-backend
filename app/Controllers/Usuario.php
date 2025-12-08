@@ -18,6 +18,29 @@ class Usuario extends ResourceController
         $this->usuarioModel = new UsuarioModel();
     }
 
+    private function validatePasswordRequirements(string $password): array
+    {
+        $errors = [];
+
+        if (mb_strlen($password) < 8) {
+            $errors[] = "La contraseña debe tener al menos 8 caracteres";
+        }
+        if (!preg_match('/[A-Z]/', $password)) {
+            $errors[] = "Falta una letra mayúscula";
+        }
+        if (!preg_match('/[a-z]/', $password)) {
+            $errors[] = "Falta una letra minúscula";
+        }
+        if (!preg_match('/\d/', $password)) {
+            $errors[] = "Falta un número";
+        }
+        if (!preg_match('/[\W_]/', $password)) {
+            $errors[] = "Falta un carácter especial";
+        }
+
+        return $errors;
+    }
+
     public function index()
     {
         $page = $this->request->getVar('page') ?? 1;
@@ -104,10 +127,10 @@ class Usuario extends ResourceController
             ],
             'contrasena' => [
                 'label' => 'Contraseña',
-                'rules' => 'required|min_length[6]|max_length[12]',
+                'rules' => 'required|min_length[8]|max_length[12]',
                 'errors' => [
                     'required' => 'La contraseña es requerida',
-                    'min_length' => 'La contraseña debe tener al menos 6 caracteres',
+                    'min_length' => 'La contraseña debe tener al menos 8 caracteres',
                     'max_length' => 'La contraseña no puede exceder 12 caracteres'
                 ]
             ],
@@ -146,10 +169,20 @@ class Usuario extends ResourceController
             ], ResponseInterface::HTTP_BAD_REQUEST);
         }
 
+        $password = $this->request->getVar('contrasena') ?? '';
+        $pwdErrors = $this->validatePasswordRequirements($password);
+        if (!empty($pwdErrors)) {
+            return $this->respond([
+                'status' => 'error',
+                'message' => 'Contraseña no cumple requisitos',
+                'errors' => ['contrasena' => $pwdErrors]
+            ], ResponseInterface::HTTP_BAD_REQUEST);
+        }
+
         $data = [
             'nombre_usuario' => $this->request->getVar('nombre_usuario'),
             'email' => $this->request->getVar('email') ?? $this->request->getVar('nombre_usuario'),
-            'contrasena_hash' => $this->request->getVar('contrasena'),
+            'contrasena_hash' => password_hash($password, PASSWORD_DEFAULT),
             'nombre_completo' => $this->request->getVar('nombre_completo'),
             'rol_id' => $this->request->getVar('rol_id'),
             'estado_id' => $this->request->getVar('estado_id') ?? EstadoModel::ACTIVO
@@ -212,9 +245,9 @@ class Usuario extends ResourceController
             ],
             'contrasena' => [
                 'label' => 'Contraseña',
-                'rules' => 'permit_empty|min_length[6]|max_length[12]',
+                'rules' => 'permit_empty|min_length[8]|max_length[12]',
                 'errors' => [
-                    'min_length' => 'La contraseña debe tener al menos 6 caracteres',
+                    'min_length' => 'La contraseña debe tener al menos 8 caracteres',
                     'max_length' => 'La contraseña no puede exceder 12 caracteres'
                 ]
             ],
@@ -262,7 +295,16 @@ class Usuario extends ResourceController
         }
 
         if ($this->request->getVar('contrasena')) {
-            $data['contrasena_hash'] = $this->request->getVar('contrasena');
+            $password = $this->request->getVar('contrasena');
+            $pwdErrors = $this->validatePasswordRequirements($password);
+            if (!empty($pwdErrors)) {
+                return $this->respond([
+                    'status' => 'error',
+                    'message' => 'Contraseña no cumple requisitos',
+                    'errors' => ['contrasena' => $pwdErrors]
+                ], ResponseInterface::HTTP_BAD_REQUEST);
+            }
+            $data['contrasena_hash'] = password_hash($password, PASSWORD_DEFAULT);
         }
 
         if ($this->request->getVar('nombre_completo')) {
@@ -424,10 +466,10 @@ class Usuario extends ResourceController
             ],
             'contrasena_nueva' => [
                 'label' => 'Contraseña nueva',
-                'rules' => 'required|min_length[6]|max_length[12]',
+                'rules' => 'required|min_length[8]|max_length[12]',
                 'errors' => [
                     'required' => 'La contraseña nueva es requerida',
-                    'min_length' => 'La contraseña debe tener al menos 6 caracteres',
+                    'min_length' => 'La contraseña debe tener al menos 8 caracteres',
                     'max_length' => 'La contraseña no puede exceder 12 caracteres'
                 ]
             ]
@@ -451,8 +493,17 @@ class Usuario extends ResourceController
             ], ResponseInterface::HTTP_UNAUTHORIZED);
         }
 
+        $pwdErrors = $this->validatePasswordRequirements($contrasenaNueva);
+        if (!empty($pwdErrors)) {
+            return $this->respond([
+                'status' => 'error',
+                'message' => 'Contraseña nueva no cumple requisitos',
+                'errors' => ['contrasena_nueva' => $pwdErrors]
+            ], ResponseInterface::HTTP_BAD_REQUEST);
+        }
+
         $updated = $this->usuarioModel->update($id, [
-            'contrasena_hash' => $contrasenaNueva
+            'contrasena_hash' => password_hash($contrasenaNueva, PASSWORD_DEFAULT)
         ]);
 
         if (!$updated) {
