@@ -119,7 +119,7 @@ $routes->group('api', ['namespace' => 'App\Controllers'], function($routes) {
         $routes->get('estadisticas/estudiante/(:num)', 'Asistencia::estadisticasPorEstudiante/$1');
         $routes->get('estadisticas/grupo/(:num)', 'Asistencia::estadisticasPorGrupo/$1');
     });
-    
+
     $routes->group('motivos-ausencia', ['filter' => 'auth'], function($routes) {
         $routes->get('', 'MotivoAusencia::index');
         $routes->get('(:num)', 'MotivoAusencia::show/$1');
@@ -127,5 +127,16 @@ $routes->group('api', ['namespace' => 'App\Controllers'], function($routes) {
         $routes->put('(:num)', 'MotivoAusencia::update/$1');
         $routes->delete('(:num)', 'MotivoAusencia::delete/$1');
         $routes->get('codigo/(:segment)', 'MotivoAusencia::getByCodigo/$1');
+    });
+
+    $routes->group('horarios', ['filter' => 'auth'], function($routes) {
+        $routes->get('', 'Horario::index');
+        $routes->get('(:num)', 'Horario::show/$1');
+        $routes->post('', 'Horario::create');
+        $routes->put('(:num)', 'Horario::update/$1');
+        $routes->delete('(:num)', 'Horario::delete/$1');
+        $routes->get('grupo/(:num)', 'Horario::porGrupo/$1');
+        $routes->get('aula/(:num)', 'Horario::porAula/$1');
+        $routes->post('validar-conflicto', 'Horario::validarConflicto');
     });
 });
