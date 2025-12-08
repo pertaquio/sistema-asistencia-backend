@@ -139,4 +139,14 @@ $routes->group('api', ['namespace' => 'App\Controllers'], function($routes) {
         $routes->get('aula/(:num)', 'Horario::porAula/$1');
         $routes->post('validar-conflicto', 'Horario::validarConflicto');
     });
+    
+    $routes->group('dashboard', ['filter' => 'auth'], function($routes) {
+        $routes->get('', 'Dashboard::index');
+        $routes->get('asistencias-semana', 'Dashboard::asistenciasSemana');
+        $routes->get('asistencias-mes', 'Dashboard::asistenciasMes');
+        $routes->get('grupos-activos', 'Dashboard::gruposMasActivos');
+        $routes->get('estudiantes-ausencias', 'Dashboard::estudiantesConMasAusencias');
+        $routes->get('proximas-sesiones', 'Dashboard::proximasSesiones');
+        $routes->get('resumen-general', 'Dashboard::resumenGeneral');
+    });
 });
