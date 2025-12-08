@@ -159,4 +159,15 @@ $routes->group('api', ['namespace' => 'App\Controllers'], function($routes) {
         $routes->get('proximas-sesiones', 'Dashboard::proximasSesiones');
         $routes->get('resumen-general', 'Dashboard::resumenGeneral');
     });
+
+    $routes->group('estados', ['filter' => 'auth'], function($routes) {
+        $routes->get('', 'Estados::index');        
+        $routes->get('(:num)', 'Estados::show/$1');  
+        $routes->post('', 'Estados::create');       
+        $routes->put('(:num)', 'Estados::update/$1'); 
+        $routes->delete('(:num)', 'Estados::delete/$1'); 
+        $routes->get('(:num)/usuarios', 'Estados::usuarios/$1');
+        $routes->get('(:num)/estadisticas', 'Estados::estadisticas/$1');
+    });
+
 });
