@@ -552,9 +552,9 @@ class Asistencia extends ResourceController
             ], ResponseInterface::HTTP_BAD_REQUEST);
         }
 
-        $fechaInicio = $this->request->getVar('fecha_inicio');
-        $fechaFin = $this->request->getVar('fecha_fin');
-        $grupoId = $this->request->getVar('grupo_id');
+        $fechaInicio = $this->request->getVar('fecha_inicio') ?: null;
+        $fechaFin = $this->request->getVar('fecha_fin') ?: null;
+        $grupoId = $this->request->getVar('grupo_id') ? (int)$this->request->getVar('grupo_id') : null;
 
         $reporte = $this->asistenciaModel->getReportePorEstudiante($estudianteId, $fechaInicio, $fechaFin, $grupoId);
 
@@ -573,8 +573,8 @@ class Asistencia extends ResourceController
             ], ResponseInterface::HTTP_BAD_REQUEST);
         }
 
-        $fechaInicio = $this->request->getVar('fecha_inicio');
-        $fechaFin = $this->request->getVar('fecha_fin');
+        $fechaInicio = $this->request->getVar('fecha_inicio') ?: null;
+        $fechaFin = $this->request->getVar('fecha_fin') ?: null;
 
         $reporte = $this->asistenciaModel->getReportePorGrupo($grupoId, $fechaInicio, $fechaFin);
 
@@ -593,7 +593,7 @@ class Asistencia extends ResourceController
             ], ResponseInterface::HTTP_BAD_REQUEST);
         }
 
-        $grupoId = $this->request->getVar('grupo_id');
+        $grupoId = $this->request->getVar('grupo_id') ? (int)$this->request->getVar('grupo_id') : null;
 
         $estadisticas = $this->asistenciaModel->getEstadisticasPorEstudiante($estudianteId, $grupoId);
 

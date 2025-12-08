@@ -102,7 +102,7 @@ $routes->group('api', ['namespace' => 'App\Controllers'], function($routes) {
         $routes->post('generar-masivas', 'Sesion::generarSesionesMasivas');
         $routes->get('(:num)/estudiantes', 'Sesion::getEstudiantesParaAsistencia/$1');
     });
-    
+
     $routes->group('asistencias', ['filter' => 'auth'], function($routes) {
         $routes->get('', 'Asistencia::index');
         $routes->get('(:num)', 'Asistencia::show/$1');
@@ -118,5 +118,14 @@ $routes->group('api', ['namespace' => 'App\Controllers'], function($routes) {
         $routes->get('reporte/grupo/(:num)', 'Asistencia::reportePorGrupo/$1');
         $routes->get('estadisticas/estudiante/(:num)', 'Asistencia::estadisticasPorEstudiante/$1');
         $routes->get('estadisticas/grupo/(:num)', 'Asistencia::estadisticasPorGrupo/$1');
+    });
+    
+    $routes->group('motivos-ausencia', ['filter' => 'auth'], function($routes) {
+        $routes->get('', 'MotivoAusencia::index');
+        $routes->get('(:num)', 'MotivoAusencia::show/$1');
+        $routes->post('', 'MotivoAusencia::create');
+        $routes->put('(:num)', 'MotivoAusencia::update/$1');
+        $routes->delete('(:num)', 'MotivoAusencia::delete/$1');
+        $routes->get('codigo/(:segment)', 'MotivoAusencia::getByCodigo/$1');
     });
 });
