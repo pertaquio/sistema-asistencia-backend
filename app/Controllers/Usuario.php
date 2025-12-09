@@ -108,15 +108,6 @@ class Usuario extends ResourceController
     public function create()
     {
         $rules = [
-            'nombre_usuario' => [
-                'label' => 'Nombre de usuario',
-                'rules' => 'required|valid_email|is_unique[usuarios.nombre_usuario]',
-                'errors' => [
-                    'required' => 'El nombre de usuario es requerido',
-                    'valid_email' => 'El nombre de usuario debe ser un correo electrónico válido',
-                    'is_unique' => 'Este nombre de usuario ya está registrado'
-                ]
-            ],
             'email' => [
                 'label' => 'Email',
                 'rules' => 'permit_empty|valid_email|is_unique[usuarios.email]',
@@ -208,81 +199,113 @@ class Usuario extends ResourceController
         ], ResponseInterface::HTTP_CREATED);
     }
 
-    public function update($id = null)
-    {
-        if (!$id) {
-            return $this->respond([
-                'status' => 'error',
-                'message' => 'ID de usuario requerido'
-            ], ResponseInterface::HTTP_BAD_REQUEST);
-        }
+public function update($id = null)
+{
+    if (!$id) {
+        return $this->respond([
+            'status' => 'error',
+            'message' => 'ID de usuario requerido'
+        ], ResponseInterface::HTTP_BAD_REQUEST);
+    }
 
-        $usuario = $this->usuarioModel->find($id);
+    $usuario = $this->usuarioModel->find($id);
 
-        if (!$usuario) {
-            return $this->respond([
-                'status' => 'error',
-                'message' => 'Usuario no encontrado'
-            ], ResponseInterface::HTTP_NOT_FOUND);
-        }
+    if (!$usuario) {
+        return $this->respond([
+            'status' => 'error',
+            'message' => 'Usuario no encontrado'
+        ], ResponseInterface::HTTP_NOT_FOUND);
+    }
 
-        $rules = [
-            'nombre_usuario' => [
-                'label' => 'Nombre de usuario',
-                'rules' => "permit_empty|valid_email|is_unique[usuarios.nombre_usuario,id,{$id}]",
-                'errors' => [
-                    'valid_email' => 'El nombre de usuario debe ser un correo electrónico válido',
-                    'is_unique' => 'Este nombre de usuario ya está registrado'
-                ]
-            ],
-            'email' => [
+    $rules = [];
+
+    $emailInput = $this->request->getVar('email');
+    if ($emailInput !== null) {
+        if ($emailInput !== $usuario['email']) {
+            $rules['email'] = [
                 'label' => 'Email',
                 'rules' => "permit_empty|valid_email|is_unique[usuarios.email,id,{$id}]",
                 'errors' => [
                     'valid_email' => 'El email debe ser válido',
                     'is_unique' => 'Este email ya está registrado'
                 ]
-            ],
-            'contrasena' => [
-                'label' => 'Contraseña',
-                'rules' => 'permit_empty|min_length[8]|max_length[12]',
+            ];
+        } else {
+            $rules['email'] = [
+                'label' => 'Email',
+                'rules' => 'permit_empty|valid_email',
                 'errors' => [
-                    'min_length' => 'La contraseña debe tener al menos 8 caracteres',
-                    'max_length' => 'La contraseña no puede exceder 12 caracteres'
+                    'valid_email' => 'El email debe ser válido'
                 ]
-            ],
-            'nombre_completo' => [
-                'label' => 'Nombre completo',
-                'rules' => 'permit_empty|min_length[3]|max_length[150]',
-                'errors' => [
-                    'min_length' => 'El nombre completo debe tener al menos 3 caracteres',
-                    'max_length' => 'El nombre completo no puede exceder 150 caracteres'
-                ]
-            ],
-            'rol_id' => [
-                'label' => 'Rol',
-                'rules' => 'permit_empty|is_natural_no_zero',
-                'errors' => [
-                    'is_natural_no_zero' => 'El rol debe ser un número válido'
-                ]
-            ],
-            'estado_id' => [
-                'label' => 'Estado',
-                'rules' => 'permit_empty|is_natural_no_zero|in_list[1,2,3]',
-                'errors' => [
-                    'is_natural_no_zero' => 'El estado debe ser un número válido',
-                    'in_list' => 'El estado debe ser 1 (Activo), 2 (Inactivo) o 3 (Suspendido)'
-                ]
-            ]
-        ];
-
-        if (!$this->validate($rules)) {
-            return $this->respond([
-                'status' => 'error',
-                'message' => 'Datos de entrada inválidos',
-                'errors' => $this->validator->getErrors()
-            ], ResponseInterface::HTTP_BAD_REQUEST);
+            ];
         }
+    }
+
+    $nombreUsuarioInput = $this->request->getVar('nombre_usuario');
+    if ($nombreUsuarioInput !== null) {
+        if ($nombreUsuarioInput !== $usuario['nombre_usuario']) {
+            $rules['nombre_usuario'] = [
+                'label' => 'Nombre de usuario',
+                'rules' => "permit_empty|min_length[3]|max_length[50]|is_unique[usuarios.nombre_usuario,id,{$id}]",
+                'errors' => [
+                    'is_unique' => 'El nombre de usuario ya está en uso',
+                    'min_length' => 'El nombre de usuario debe tener al menos 3 caracteres',
+                    'max_length' => 'El nombre de usuario no puede exceder 50 caracteres'
+                ]
+            ];
+        } else {
+            $rules['nombre_usuario'] = [
+                'label' => 'Nombre de usuario',
+                'rules' => 'permit_empty|min_length[3]|max_length[50]',
+                'errors' => [
+                    'min_length' => 'El nombre de usuario debe tener al menos 3 caracteres',
+                    'max_length' => 'El nombre de usuario no puede exceder 50 caracteres'
+                ]
+            ];
+        }
+    }
+
+    $rules = array_merge($rules, [
+        'contrasena' => [
+            'label' => 'Contraseña',
+            'rules' => 'permit_empty|min_length[8]|max_length[12]',
+            'errors' => [
+                'min_length' => 'La contraseña debe tener al menos 8 caracteres',
+                'max_length' => 'La contraseña no puede exceder 12 caracteres'
+            ]
+        ],
+        'nombre_completo' => [
+            'label' => 'Nombre completo',
+            'rules' => 'permit_empty|min_length[3]|max_length[150]',
+            'errors' => [
+                'min_length' => 'El nombre completo debe tener al menos 3 caracteres',
+                'max_length' => 'El nombre completo no puede exceder 150 caracteres'
+            ]
+        ],
+        'rol_id' => [
+            'label' => 'Rol',
+            'rules' => 'permit_empty|is_natural_no_zero',
+            'errors' => [
+                'is_natural_no_zero' => 'El rol debe ser un número válido'
+            ]
+        ],
+        'estado_id' => [
+            'label' => 'Estado',
+            'rules' => 'permit_empty|is_natural_no_zero|in_list[1,2,3]',
+            'errors' => [
+                'is_natural_no_zero' => 'El estado debe ser un número válido',
+                'in_list' => 'El estado debe ser 1 (Activo), 2 (Inactivo) o 3 (Suspendido)'
+            ]
+        ]
+    ]);
+
+    if (!empty($rules) && !$this->validate($rules)) {
+        return $this->respond([
+            'status' => 'error',
+            'message' => 'Datos de entrada inválidos',
+            'errors' => $this->validator->getErrors()
+        ], ResponseInterface::HTTP_BAD_REQUEST);
+    }
 
         $data = [];
 

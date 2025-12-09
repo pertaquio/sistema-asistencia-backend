@@ -27,7 +27,6 @@ class UsuarioModel extends Model
     protected array $casts = [
         'estado_id' => 'int',
     ];
-    protected array $castHandlers = [];
 
     protected $useTimestamps = true;
     protected $dateFormat = 'datetime';
@@ -36,20 +35,22 @@ class UsuarioModel extends Model
     protected $deletedField = 'deleted_at';
 
     protected $validationRules = [
-        'nombre_usuario' => 'required|valid_email|min_length[3]|max_length[80]|is_unique[usuarios.nombre_usuario,id,{id}]',
-        'email' => 'permit_empty|valid_email|max_length[150]|is_unique[usuarios.email,id,{id}]',
-        'contrasena_hash' => 'required',
-        'rol_id' => 'required|is_natural_no_zero',
-        'estado_id' => 'required|is_natural_no_zero'
+        'nombre_usuario'   => 'required|valid_email|min_length[3]|max_length[80]',
+        'email'            => 'permit_empty|valid_email|max_length[150]',
+        'contrasena_hash'  => 'permit_empty',
+        'rol_id'           => 'required|is_natural_no_zero',
+        'estado_id'        => 'required|is_natural_no_zero'
     ];
 
     protected $validationMessages = [
         'nombre_usuario' => [
-            'required' => 'El nombre de usuario es requerido',
-            'valid_email' => 'El nombre de usuario debe ser un correo electrónico válido',
+            'required'   => 'El nombre de usuario es requerido',
+            'valid_email'=> 'El nombre de usuario debe ser un correo electrónico válido',
             'min_length' => 'El nombre de usuario debe tener al menos 3 caracteres',
-            'max_length' => 'El nombre de usuario no puede exceder 80 caracteres',
-            'is_unique' => 'Este nombre de usuario ya está registrado'
+            'max_length' => 'El nombre de usuario no puede exceder 80 caracteres'
+        ],
+        'email' => [
+            'valid_email'=> 'El email debe ser válido'
         ]
     ];
 
@@ -58,13 +59,7 @@ class UsuarioModel extends Model
 
     protected $allowCallbacks = true;
     protected $beforeInsert = ['hashPassword'];
-    protected $afterInsert = [];
     protected $beforeUpdate = ['hashPassword'];
-    protected $afterUpdate = [];
-    protected $beforeFind = [];
-    protected $afterFind = [];
-    protected $beforeDelete = [];
-    protected $afterDelete = [];
 
     protected function hashPassword(array $data)
     {
