@@ -51,10 +51,6 @@ class HorarioModel extends Model
             'required' => 'El grupo es requerido',
             'is_natural_no_zero' => 'El grupo debe ser válido'
         ],
-        'aula_id' => [
-            'required' => 'El aula es requerida',
-            'is_natural_no_zero' => 'El aula debe ser válida'
-        ],
         'curso_id' => [
             'required' => 'El curso es requerido',
             'is_natural_no_zero' => 'El curso debe ser válido'
@@ -109,11 +105,6 @@ class HorarioModel extends Model
             ->findAll();
     }
 
-    public function getHorariosPorAula(int $aulaId)
-    {
-        return [];
-    }
-
     public function getHorariosPorDia(int $diaSemana)
     {
         return $this->select('horarios.*, 
@@ -126,7 +117,7 @@ class HorarioModel extends Model
             ->findAll();
     }
 
-    public function verificarConflictoAula(int $aulaId, int $diaSemana, string $horaInicio, string $horaFin, ?int $horarioId = null): bool
+    public function verificarConflictoAula(int $diaSemana, string $horaInicio, string $horaFin, ?int $horarioId = null): bool
     {
         return false;
     }

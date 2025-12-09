@@ -164,7 +164,6 @@ class Horario extends ResourceController
             ], ResponseInterface::HTTP_BAD_REQUEST);
         }
 
-        $aulaId = $this->request->getVar('aula_id');
         $grupoId = $this->request->getVar('grupo_id');
         $diaSemana = $this->request->getVar('dia_semana');
         $horaInicio = $this->request->getVar('hora_inicio');
@@ -247,13 +246,6 @@ class Horario extends ResourceController
                     'is_natural_no_zero' => 'El grupo debe ser válido'
                 ]
             ],
-            'aula_id' => [
-                'label' => 'Aula',
-                'rules' => 'permit_empty|is_natural_no_zero',
-                'errors' => [
-                    'is_natural_no_zero' => 'El aula debe ser válida'
-                ]
-            ],
             'curso_id' => [
                 'label' => 'Curso',
                 'rules' => 'permit_empty|is_natural_no_zero',
@@ -283,6 +275,13 @@ class Horario extends ResourceController
                     'regex_match' => 'La hora de fin debe tener formato HH:MM o HH:MM:SS'
                 ]
             ],
+            'ubicacion' => [
+                'label' => 'Ubicación',
+                'rules' => 'permit_empty|max_length[120]',
+                'errors' => [
+                    'max_length' => 'La ubicación no puede exceder 120 caracteres'
+                ]
+            ],
             'estado_id' => [
                 'label' => 'Estado',
                 'rules' => 'permit_empty|is_natural_no_zero|in_list[1,2,3]',
@@ -303,23 +302,19 @@ class Horario extends ResourceController
 
         $data = [];
 
-        if ($this->request->getVar('grupo_id')) {
+        if ($this->request->getVar('grupo_id') !== null) {
             $data['grupo_id'] = $this->request->getVar('grupo_id');
         }
 
-        if ($this->request->getVar('aula_id')) {
-            $data['aula_id'] = $this->request->getVar('aula_id');
-        }
-
-        if ($this->request->getVar('curso_id')) {
+        if ($this->request->getVar('curso_id') !== null) {
             $data['curso_id'] = $this->request->getVar('curso_id');
         }
 
-        if ($this->request->getVar('dia_semana')) {
+        if ($this->request->getVar('dia_semana') !== null) {
             $data['dia_semana'] = $this->request->getVar('dia_semana');
         }
 
-        if ($this->request->getVar('hora_inicio')) {
+        if ($this->request->getVar('hora_inicio') !== null) {
             $horaInicio = $this->request->getVar('hora_inicio');
             if (strlen($horaInicio) == 5) {
                 $horaInicio .= ':00';
@@ -327,12 +322,16 @@ class Horario extends ResourceController
             $data['hora_inicio'] = $horaInicio;
         }
 
-        if ($this->request->getVar('hora_fin')) {
+        if ($this->request->getVar('hora_fin') !== null) {
             $horaFin = $this->request->getVar('hora_fin');
             if (strlen($horaFin) == 5) {
                 $horaFin .= ':00';
             }
             $data['hora_fin'] = $horaFin;
+        }
+
+        if ($this->request->getVar('ubicacion') !== null) {
+            $data['ubicacion'] = $this->request->getVar('ubicacion');
         }
 
         if ($this->request->getVar('estado_id') !== null) {
@@ -346,7 +345,6 @@ class Horario extends ResourceController
             ], ResponseInterface::HTTP_BAD_REQUEST);
         }
 
-        $aulaId = $data['aula_id'] ?? $horario['aula_id'];
         $grupoId = $data['grupo_id'] ?? $horario['grupo_id'];
         $diaSemana = $data['dia_semana'] ?? $horario['dia_semana'];
         $horaInicio = $data['hora_inicio'] ?? $horario['hora_inicio'];
@@ -357,13 +355,6 @@ class Horario extends ResourceController
                 'status' => 'error',
                 'message' => 'La hora de fin debe ser mayor que la hora de inicio'
             ], ResponseInterface::HTTP_BAD_REQUEST);
-        }
-
-        if ($this->horarioModel->verificarConflictoAula($aulaId, $diaSemana, $horaInicio, $horaFin, $id)) {
-            return $this->respond([
-                'status' => 'error',
-                'message' => 'El aula ya tiene un horario asignado en ese día y hora'
-            ], ResponseInterface::HTTP_CONFLICT);
         }
 
         if ($this->horarioModel->verificarConflictoGrupo($grupoId, $diaSemana, $horaInicio, $horaFin, $id)) {
@@ -447,37 +438,15 @@ class Horario extends ResourceController
         ], ResponseInterface::HTTP_OK);
     }
 
-    public function porAula($aulaId = null)
-    {
-        if (!$aulaId) {
-            return $this->respond([
-                'status' => 'error',
-                'message' => 'ID de aula requerido'
-            ], ResponseInterface::HTTP_BAD_REQUEST);
-        }
-
-        $horarios = $this->horarioModel->getHorariosPorAula($aulaId);
-
-        foreach ($horarios as &$horario) {
-            $horario['dia_semana_nombre'] = $this->horarioModel->getNombreDia($horario['dia_semana']);
-        }
-
-        return $this->respond([
-            'status' => 'success',
-            'data' => $horarios
-        ], ResponseInterface::HTTP_OK);
-    }
-
     public function validarConflicto()
     {
-        $aulaId = $this->request->getVar('aula_id');
         $grupoId = $this->request->getVar('grupo_id');
         $diaSemana = $this->request->getVar('dia_semana');
         $horaInicio = $this->request->getVar('hora_inicio');
         $horaFin = $this->request->getVar('hora_fin');
         $horarioId = $this->request->getVar('horario_id');
 
-        if (!$aulaId || !$grupoId || !$diaSemana || !$horaInicio || !$horaFin) {
+        if (!$grupoId || !$diaSemana || !$horaInicio || !$horaFin) {
             return $this->respond([
                 'status' => 'error',
                 'message' => 'Faltan parámetros requeridos'
@@ -491,14 +460,12 @@ class Horario extends ResourceController
             $horaFin .= ':00';
         }
 
-        $conflictoAula = $this->horarioModel->verificarConflictoAula($aulaId, $diaSemana, $horaInicio, $horaFin, $horarioId);
         $conflictoGrupo = $this->horarioModel->verificarConflictoGrupo($grupoId, $diaSemana, $horaInicio, $horaFin, $horarioId);
 
         return $this->respond([
             'status' => 'success',
             'data' => [
-                'tiene_conflicto' => $conflictoAula || $conflictoGrupo,
-                'conflicto_aula' => $conflictoAula,
+                'tiene_conflicto' => $conflictoGrupo,
                 'conflicto_grupo' => $conflictoGrupo
             ]
         ], ResponseInterface::HTTP_OK);
