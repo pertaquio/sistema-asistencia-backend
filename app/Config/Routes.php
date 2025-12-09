@@ -170,4 +170,17 @@ $routes->group('api', ['namespace' => 'App\Controllers'], function($routes) {
         $routes->get('(:num)/estadisticas', 'Estados::estadisticas/$1');
     });
 
+    $routes->group('auditorias', ['filter' => 'auth'], function($routes) {
+        $routes->get('', 'Auditoria::index');
+        $routes->get('(:num)', 'Auditoria::show/$1');
+        $routes->get('usuario/(:num)', 'Auditoria::porUsuario/$1');
+        $routes->get('tabla/(:segment)', 'Auditoria::porTabla/$1');
+        $routes->get('historial', 'Auditoria::historial');
+        $routes->get('estadisticas', 'Auditoria::estadisticas');
+        $routes->get('actividad/por-dia', 'Auditoria::actividadPorDia');
+        $routes->get('actividad/por-hora', 'Auditoria::actividadPorHora');
+        $routes->get('tablas', 'Auditoria::tablas');
+        $routes->get('acciones', 'Auditoria::acciones');
+        $routes->get('comparar', 'Auditoria::comparar');
+    });
 });
