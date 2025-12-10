@@ -7,10 +7,20 @@ Incluye roles de **Administrador**, **Docente** y **Estudiante**, permitiendo re
 ---
 
 # 🛠️ Tecnologías Utilizadas
-- **PHP 8.3**
-- **CodeIgniter 4.x**
+- **PHP 8.3.21**
+- **CodeIgniter 4**
 - **MySQL / MariaDB**
-- Composer
+- **Git**
+---
+
+# 🛠️ Entorno de desarrollo
+- **Navicat Premium 16**
+- **Visual Estudio Code 1.106**
+- **GitHub Desktop 3.5.1**
+- **Laragon 2025 v8.2.3**
+- **Postman 11.75.1**
+- Plantilla Premium Steex Admin - https://themeforest.net/item/steex-html-laravel-admin-dashboard-template/45530448
+- Datasets - 1,040 Usuarios, 70 Cursos, 1,800+ Asistencias - https://www.kaggle.com/datasets/pertaquio/sistema-de-asistencia-acadmica/data
 
 ---
 
@@ -19,7 +29,7 @@ Incluye roles de **Administrador**, **Docente** y **Estudiante**, permitiendo re
 - Un **usuario** puede ser **docente** o **estudiante**.  
 - Un **curso** contiene **grupos**.  
 - Un **grupo** tiene **un docente responsable**.  
-- Un **grupo** tiene **muchos estudiantes** (vía matrículas).  
+- Un **grupo** tiene **muchos estudiantes**.  
 - Una **sesión** pertenece a un solo grupo.  
 - Una **asistencia** se registra por sesión y por estudiante.
 
@@ -27,12 +37,12 @@ Incluye roles de **Administrador**, **Docente** y **Estudiante**, permitiendo re
 
 # Datos de Prueba
 
-| Email                   | Contraseña | Rol          | Estado     |
-|-------------------------|------------|--------------|------------|
-| admin@sistema.com       | admin123   | Administrador| Activo     |
-| profesor@sistema.com    | prof123    | Profesor     | Activo     |
-| estudiante@sistema.com  | est123     | Estudiante   | Inactivo   |
-| suspendido@sistema.com  | susp123    | Estudiante   | Suspendido |
+| Email                                | Contraseña | Rol          | Estado     |
+|--------------------------------------|------------|--------------|------------|
+| administrador@cristiansoft.com       | Cris*25+   | Administrador| Activo     |
+| prof002@cristiansoft.com             | Cris*25+   | Profesor     | Activo     |
+| est0993@cristiansoft.com             | Cris*25+   | Estudiante   | Inactivo   |
+| est1000@cristiansoft.com             | Cris*25+   | Estudiante   | Suspendido |
 
 ---
 
